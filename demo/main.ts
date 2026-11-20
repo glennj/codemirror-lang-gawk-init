@@ -39,12 +39,12 @@ $6 ~ /"GET|"POST/ {
 }
 
 END {
-    print "\n--- Summary Report ---"
+    print "\\n--- Summary Report ---"
     for (ip in requests) {
-        printf "IP: %-15s | Requests: %4d | Total Bytes: %d\n", ip, requests[ip], total_bytes[ip]
+        printf "IP: %-15s | Requests: %4d | Total Bytes: %d\\n", ip, requests[ip], total_bytes[ip]
     }
     
-    print "\nTop Endpoints:"
+    print "\\nTop Endpoints:"
     for (url in endpoints) {
         print "  ->", url, "(hits:", endpoints[url] ")"
     }
@@ -56,8 +56,8 @@ END {
 
 # Convert CSV to JSON Records
 function escape_json(str) {
-    gsub(/"/, "\\\\\"", str)
-    gsub(/\n/, "\\n", str)
+    gsub(/"/, "\\\\\\\"", str)
+    gsub(/\\n/, "\\\\n", str)
     return str
 }
 
@@ -77,16 +77,16 @@ NR == 1 {
 
 {
     if (NR > 2) print ","
-    printf "  {\n"
+    printf "  {\\n"
     for (i = 1; i <= NF; i++) {
         val = escape_json($i)
-        printf "    \"%s\": \"%s\"%s\n", headers[i], val, (i < NF ? "," : "")
+        printf "    \"%s\": \"%s\"%s\\n", headers[i], val, (i < NF ? "," : "")
     }
     printf "  }"
 }
 
 END {
-    print "\n]"
+    print "\\n]"
     print "Total Records Processed:", NR - 1
 }
 `,
@@ -100,7 +100,7 @@ BEGIN {
     parsed = mktime("2026 08 08 14 30 00")
     print "Parsed Date Epoch:      ", parsed
 
-    print "\n--- Bitwise Operations ---"
+    print "\\n--- Bitwise Operations ---"
     a = 0x0F  # 15
     b = 0x33  # 51
 
@@ -111,7 +111,7 @@ BEGIN {
     print "RSHIFT 1:", rshift(b, 1)
     print "COMPL a: ", compl(a)
 
-    print "\n--- Dynamic Type Check ---"
+    print "\\n--- Dynamic Type Check ---"
     arr[1] = "gawk"
     print "typeof(now):", typeof(now)
     print "typeof(arr):", typeof(arr)
@@ -173,7 +173,7 @@ function updateTokenInspector() {
 
   // Stream tokenize lines
   const lines = code.split('\n');
-  const state = gawkStreamParser.startState();
+  const state = gawkStreamParser.startState!(0);
 
   for (const line of lines) {
     const stream = {

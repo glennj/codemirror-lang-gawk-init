@@ -1,4 +1,5 @@
-import { StringStream } from '@codemirror/language';
+import { StringStream, StreamParser } from '@codemirror/language';
+import { tags as t } from '@lezer/highlight';
 import {
   GAWK_PATTERNS,
   GAWK_KEYWORDS,
@@ -17,8 +18,17 @@ export interface GawkState {
   lastToken: string;
 }
 
-export const gawkStreamParser = {
+export const gawkStreamParser: StreamParser<GawkState> = {
   name: 'gawk',
+
+  tokenTable: {
+    'special(keyword)': t.special(t.keyword),
+    'special(variableName)': t.special(t.variableName),
+    'standard(variableName)': t.standard(t.variableName),
+    'standard(name)': t.standard(t.name),
+    'function(definition)': t.definition(t.function(t.variableName)),
+    'function(call)': t.function(t.variableName)
+  },
 
   startState(): GawkState {
     return {
@@ -47,30 +57,42 @@ export const gawkStreamParser = {
 
     // 3. Handle string literals
     if (state.inString) {
+      let escaped = false;
       while (!stream.eol()) {
         const ch = stream.next();
-        if (ch === '\\') {
-          stream.next(); // Skip escaped character
+        if (escaped) {
+          escaped = false;
+        } else if (ch === '\\') {
+          escaped = true;
         } else if (ch === state.stringQuote) {
           state.inString = false;
           state.expectRegex = false;
           return 'string';
         }
       }
+      if (!escaped) {
+        state.inString = false;
+      }
       return 'string';
     }
 
     // 4. Handle regex literals
     if (state.inRegex) {
+      let escaped = false;
       while (!stream.eol()) {
         const ch = stream.next();
-        if (ch === '\\') {
-          stream.next(); // Skip escape
+        if (escaped) {
+          escaped = false;
+        } else if (ch === '\\') {
+          escaped = true;
         } else if (ch === '/') {
           state.inRegex = false;
           state.expectRegex = false;
           return 'regexp';
         }
+      }
+      if (!escaped) {
+        state.inRegex = false;
       }
       return 'regexp';
     }
