@@ -4,6 +4,14 @@
 
 ---
 
+> **Note for Exercism Integration:** To ensure compatibility with the Exercism website platform, the following dependency version constraints are maintained:
+> ```json
+> "@codemirror/language": "^6.10.1",
+> "@lezer/highlight": "^1.2.0",
+> "@lezer/lr": "^1.4.0"
+> ```
+
+
 ## 🚀 How to Run the Demo
 
 ### Prerequisites
